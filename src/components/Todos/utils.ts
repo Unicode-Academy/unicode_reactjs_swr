@@ -1,3 +1,4 @@
+import useSWR, { mutate as mutateGlobal } from "swr";
 import { fetcher } from "../../utils/fetcher";
 type TodoFetcher = {
   url: string;
@@ -18,3 +19,18 @@ export const todoDetailFetcher = ({
 }: TodoFetcher) => fetcher<Todo>(url, method, null, headers);
 
 export const todoUrl = `http://localhost:3000/todos`;
+
+export const useTodosQuery = () => {
+  return useSWR({ url: todoUrl }, todoFetcher);
+};
+
+export const useTodosMutate = () => {
+  const mutate = (callback: (data?: Todo[]) => Todo[] | undefined) => {
+    if (typeof callback === "function") {
+      return mutateGlobal({ url: todoUrl }, callback, {
+        revalidate: false,
+      });
+    }
+  };
+  return { mutate };
+};

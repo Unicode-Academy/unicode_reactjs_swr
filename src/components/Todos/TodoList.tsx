@@ -1,15 +1,16 @@
-import useSWR from "swr";
-import { todoFetcher, todoUrl } from "./utils";
+// import useSWR from "swr";
+// import { todoFetcher, todoUrl } from "./utils";
 import { Link } from "react-router-dom";
-import TodoAdd from "./TodoAdd";
+import { useTodosQuery } from "./utils";
 
 export default function TodoList() {
-  const {
-    data: todoList,
-    error,
-    isLoading,
-    // mutate,
-  } = useSWR({ url: todoUrl }, todoFetcher);
+  // const {
+  //   data: todoList,
+  //   error,
+  //   isLoading,
+  //   // mutate,
+  // } = useSWR({ url: todoUrl }, todoFetcher);
+  const { data: todoList, error, isLoading } = useTodosQuery();
   if (error) {
     return <h3>Failed to load</h3>;
   }
@@ -25,8 +26,6 @@ export default function TodoList() {
           </h4>
         ))
       )}
-
-      <TodoAdd />
     </div>
   );
 }
