@@ -1,8 +1,8 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { mutate } from "swr";
-import { todoUrl } from "./utils";
+import { Todo, todoUrl } from "./utils";
 
-const addTodo = async (title: string): Promise<boolean> => {
+const addTodo = async (title: string): Promise<Todo | boolean> => {
   const response = await fetch(todoUrl, {
     method: "POST",
     headers: {
@@ -10,7 +10,10 @@ const addTodo = async (title: string): Promise<boolean> => {
     },
     body: JSON.stringify({ title, completed: false }),
   });
-  return response.ok;
+  if (!response.ok) {
+    return false;
+  }
+  return response.json();
 };
 // type TodoAddProps = {
 //   mutate?: () => void;
@@ -20,12 +23,23 @@ export default function TodoAdd() {
   const [msg, setMsg] = useState<string>("");
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const status = await addTodo(title);
-    if (status) {
-      setMsg("Thêm thành công");
-      setTitle("");
-      mutate({ url: todoUrl });
+    const todo = await addTodo(title);
+    if (!todo) {
+      return setMsg("Add Todo Failed");
     }
+    setMsg("Thêm thành công");
+    setTitle("");
+    mutate(
+      { url: todoUrl },
+      (data) => {
+        //data ==> Dữ liệu cũ
+        //return về dữ liệu mới ==> todoList sẽ được update
+        return [...data, todo];
+      },
+      {
+        revalidate: false, //Không refetch api
+      }
+    );
   };
   return (
     <div>
