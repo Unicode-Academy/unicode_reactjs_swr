@@ -1,8 +1,12 @@
-// import Users from "./components/Users";
-
-import UsersSwr from "./components/UsersSwr";
+import { Route, Routes } from "react-router-dom";
+import TodoList from "./components/Todos/TodoList";
+import TodoDetail from "./components/Todos/TodoDetail";
 
 export default function App() {
-  // return <div>{/* <Users /> */}</div>;
-  return <UsersSwr />;
+  return (
+    <Routes>
+      <Route path="/todos" element={<TodoList />} />
+      <Route path="/todos/:id" element={<TodoDetail />} />
+    </Routes>
+  );
 }
