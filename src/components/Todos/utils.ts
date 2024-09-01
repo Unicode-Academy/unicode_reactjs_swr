@@ -17,4 +17,4 @@ export const todoDetailFetcher = ({
   headers,
 }: TodoFetcher) => fetcher<Todo>(url, method, null, headers);
 
-export const todoUrl = `https://jsonplaceholder.typicode.com/todos`;
+export const todoUrl = `http://localhost:3000/todos`;
