@@ -1,28 +1,21 @@
-import axios from "axios";
-import useSWR from "swr";
-const fetcher = async <T,>(url: string): Promise<T> => {
-  const instance = axios.create({
-    baseURL: "https://jsonplaceholder.typicode.com",
-    headers: {
-      "x-api-key": "ahihi",
-    },
-  });
-  const response = await instance.get(url);
-  return response.data;
-};
-type Todo = {
-  title: string;
-  completed: boolean;
-};
-type Post = {
-  title: string;
-  body: string;
-};
-export default function App() {
-  //   const { data } = useSWR("/todos", fetcher<Todo>);
-  //   console.log(data);
-  const { data } = useSWR("/posts", fetcher<Post>);
-  console.log(data);
+import { Route, Routes } from "react-router-dom";
+import TodoList from "./components/Todos/TodoList";
+import TodoDetail from "./components/Todos/TodoDetail";
+import TodoAdd from "./components/Todos/TodoAdd";
 
-  return <div>App</div>;
+export default function App() {
+  return (
+    <Routes>
+      <Route
+        path="/todos"
+        element={
+          <>
+            <TodoList />
+            <TodoAdd />
+          </>
+        }
+      />
+      <Route path="/todos/:id" element={<TodoDetail />} />
+    </Routes>
+  );
 }

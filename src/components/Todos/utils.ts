@@ -18,10 +18,14 @@ export const todoDetailFetcher = ({
   headers,
 }: TodoFetcher) => fetcher<Todo>(url, method, null, headers);
 
-export const todoUrl = `http://localhost:3000/todos`;
+export const todoUrl = `https://jsonplaceholder.typicode.com/todos`;
 
 export const useTodosQuery = () => {
-  return useSWR({ url: todoUrl }, todoFetcher);
+  return useSWR({ url: todoUrl }, todoFetcher, {
+    revalidateOnFocus: false,
+    // refreshInterval: 1000,
+    revalidateOnReconnect: true,
+  });
 };
 
 export const useTodosMutate = () => {
