@@ -4,6 +4,39 @@ import Photos from "./components/Photos";
 interface ResponseError extends Error {
   status?: number;
 }
+interface Cache<Data> {
+  get(key: string): Data | undefined;
+  set(key: string, value: Data): void;
+  delete(key: string): void;
+  keys(): IterableIterator<string>;
+}
+const localStorageProvider = <T,>(): Cache<T> => {
+  const map = new Map(JSON.parse(localStorage.getItem("app-cache") || "[]"));
+  return {
+    get: (key: string): T | undefined => {
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) : undefined;
+    },
+    set: (key: string, value: T) => {
+      map.set(key, value);
+      localStorage.setItem(
+        "app-cache",
+        JSON.stringify(Array.from(map.entries()))
+      );
+    },
+    delete: (key: string): void => {
+      map.delete(key);
+      localStorage.setItem(
+        "app-cache",
+        JSON.stringify(Array.from(map.entries()))
+      );
+    },
+    keys: (): IterableIterator<string> => {
+      const keys = Object.keys(localStorage);
+      return keys[Symbol.iterator]();
+    },
+  };
+};
 
 const fetcher = async <T,>(url: string): Promise<T> => {
   // const instance = axios.create({
@@ -22,6 +55,7 @@ const fetcher = async <T,>(url: string): Promise<T> => {
   }
   return response.json();
 };
+
 export default function App() {
   const fallbackData = {
     // "/photos": [],
@@ -34,6 +68,7 @@ export default function App() {
         // revalidateOnFocus: false,
         fallbackData: [],
         fallback: fallbackData,
+        provider: localStorageProvider,
       }}
     >
       <Photos />
