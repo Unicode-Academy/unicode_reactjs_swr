@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+
 type FormData = {
   email: string;
   password: string;
 };
 export default function Login() {
   const [form, setForm] = useState<FormData>({} as FormData);
+
   const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
