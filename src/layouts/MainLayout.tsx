@@ -1,6 +1,7 @@
-import { Outlet } from "react-router-dom";
-import useSWR from "swr";
+import { Outlet, useNavigate } from "react-router-dom";
+import useSWR, { mutate } from "swr";
 import { fetcher } from "../utils/fetcher";
+import { useLogout } from "../hooks/auth";
 type User = {
   id: number;
   name: string;
@@ -19,6 +20,7 @@ export const authFetcher = async ({
 }) => {
   try {
     const url = `${import.meta.env.VITE_SERVER_API}${path}`;
+
     const token = JSON.parse(localStorage.getItem("user_token") ?? "{}");
     const response: User = await fetcher<User>(url, method, null, {
       Authorization: `Bearer ${token.access_token}`,
@@ -44,13 +46,11 @@ export default function MainLayout() {
     authFetcher,
     {
       fallbackData: {} as User,
+      revalidateOnFocus: false,
     }
   );
-
-  //   if (error?.status === 401 && pathname !== "/login") {
-  //     localStorage.removeItem("user_token");
-  //     return <Navigate to="/login" />;
-  //   }
+  const logout = useLogout();
+  const navigate = useNavigate();
   return (
     <>
       <header className="py-3">
@@ -67,7 +67,17 @@ export default function MainLayout() {
                   <>
                     <li>Chào bạn: {data?.name}</li>
                     <li>
-                      <a href="#">Đăng xuất</a>
+                      <a
+                        href="#"
+                        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                          e.preventDefault();
+                          logout();
+                          mutate({ path: "/auth/profile" }, null);
+                          navigate("/login");
+                        }}
+                      >
+                        Đăng xuất
+                      </a>
                     </li>
                   </>
                 ) : (

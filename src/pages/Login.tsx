@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { mutate } from "swr";
 
 type FormData = {
   email: string;
@@ -20,6 +21,12 @@ export default function Login() {
     }
 
     localStorage.setItem("user_token", JSON.stringify(response));
+
+    const profile = await getProfile(response.access_token);
+
+    mutate({ path: "/auth/profile" }, profile, {
+      revalidate: false,
+    });
   };
   const sendRequestLogin = async () => {
     try {
@@ -37,6 +44,19 @@ export default function Login() {
     } catch (e) {
       return e;
     }
+  };
+  const getProfile = async (accessToken: string) => {
+    const response: Response = await fetch(
+      `${import.meta.env.VITE_SERVER_API}/auth/profile`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.json();
   };
   return (
     <div className="w-50 mx-auto">
